@@ -17,16 +17,17 @@ if (!userHasRole('Editor'))
 		exit();
 	}
 	
-
+	
 if (isset($_GET['add']))
   {
-		
-	$pagetitle='Introducere Carte noua';
+			
+	$pagetitle='Adauga Carte';
 	$action='addform';
 	$text='';
+	$autor='';
 	$authorid='';
 	$id='';
-	$button='adauga carte';
+	$button='Adauga';
 
 	
 	if (isset($_GET['add']))
@@ -53,7 +54,7 @@ if (isset($_GET['add']))
 	$result=mysqli_query($link, $sql);
 	if (!$result)
 		{
-		$error='Eroare la afisarea listei de cateorii.';
+		$error='Eroare la afisarea listei de categorii.';
 		include 'error.html.php';
 		exit();
 		}
@@ -284,7 +285,7 @@ if (isset($_GET['action']) and $_GET['action'] == 'search')
  {
 	include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/db.inc.php';
 	// The basic SELECT statement
-	$select = 'SELECT id, booktext';
+	$select = 'SELECT id, bookname';
 	$from = ' FROM book';
 	$where = ' WHERE TRUE';
 	
@@ -310,7 +311,7 @@ if (isset($_GET['action']) and $_GET['action'] == 'search')
 	$result = mysqli_query($link, $select . $from . $where);
 	if (!$result)
 	{
-		$error = 'Eroare la afisarea catilor.';
+		$error = 'Eroare la afisarea cartilor.';
 		include 'error.html.php';
 		exit();
 	}
@@ -323,7 +324,7 @@ if (isset($_GET['action']) and $_GET['action'] == 'search')
 	$result = mysqli_query($link, 'SELECT id, name FROM category');
 	if (!$result)	
 	{
-		$error='Error fetching categories from database!';
+		$error='Eroare la afisarea categoriilor din baza de date!';
 		include 'error.html.php';
 		exit();
 	}	
@@ -336,7 +337,7 @@ if (isset($_GET['action']) and $_GET['action'] == 'search')
 	$result = mysqli_query($link, 'SELECT id, name FROM author');
 	if (!$result)
 	{
-		$error = 'Eroare la afisarea editorilor  din bazab de date!';
+		$error = 'Eroare la afisarea editorilor  din baza de date!';
 		include 'error.html.php';
 		exit();
 	}	
@@ -352,12 +353,13 @@ if (isset($_GET['action']) and $_GET['action'] == 'search')
 	exit();
  }
 
+
 // Display searchform
 include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/db.inc.php';
 $result = mysqli_query($link, 'SELECT id, name FROM category');
 if (!$result)	
 {
-	$error='Eroare la afisarea cateoriilor din baza de date!';
+	$error='Eroare la afisarea categoriilor din baza de date!';
 	include 'error.html.php';
 	exit();
 }	
@@ -370,7 +372,7 @@ while ($row=mysqli_fetch_array($result))
 $result = mysqli_query($link, 'SELECT id, name FROM author');
 if (!$result)
 {
-	$error = 'Eroare la aisarea editorilor din baza de date!';
+	$error = 'Eroare la afisarea editorilor din baza de date!';
 	include 'error.html.php';
 	exit();
 }	
@@ -380,7 +382,7 @@ while ($row = mysqli_fetch_array($result))
 	$authors[] = array('id' => $row['id'], 'name' => $row['name']);
 }
 
-$result = mysqli_query($link, 'SELECT id, bookname, authorid FROM book');
+$result = mysqli_query($link, 'SELECT id, bookname, authorid, bookautor FROM book');
 if (!$result)
   {
 	$error = 'Eroare la afisarea cartilor din baza de date!';
@@ -388,13 +390,16 @@ if (!$result)
 	exit();
   }	
 
+  
 while ($row = mysqli_fetch_array($result))
   {
-	$books[] = array('id' => $row['id'], 'text' => $row['bookname'], 'authorid' => $row['authorid']);
+	  
+	 // print_r($row);
+	$books[] = array('id' => $row['id'], 'text' => $row['bookname'], 'authorid' => $row['authorid'], 'bookautor' => $row['bookautor'] );
   }
 
 
 include  'searchform.html.php';
-include  'book.html.php';
+//include  'book.html.php';
   
 ?>

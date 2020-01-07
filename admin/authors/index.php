@@ -9,19 +9,26 @@ if (!userIsLoggedIn())
 	exit();
 }
 
-//echo $_POST['email'];
+   
+if (!userHasRole('Administrator'))
+{
+	$error='Doar utilizatorii cu drept de Administrator pot accesa aceasta pagina.';
+	include '../accessdenied.html.php';
+	include '../logout.html.php';
+	exit();
+}
 
 
 if (isset($_GET['add']))
 {
 	include $_SERVER['DOCUMENT_ROOT'].'/biblioteca/includes/db.inc.php';
-	$pagetitle='Adaugare Utilizator';
+	$pagetitle='New Author';
 	$action='addform';
 	$name='';
 	$pren='';
 	$email='';
 	$id='';
-	$button='Adauga utilizator';
+	$button='Add author';
 	
 	//Build the list of roles
 	$sql = "SELECT id, description FROM role";
@@ -29,7 +36,7 @@ if (isset($_GET['add']))
 	if(!$result)
 	{
 		$error ='Eroare la afisarea listei de roluri';
-		include '../error.html.php';
+		include 'error.html.php';
 		exit();
 	}
 
@@ -93,7 +100,7 @@ if (isset($_GET['addform']))
 			if (!mysqli_query($link,$sql))
 			{
 				$error='Eroare la stabilirea rolului pentru utilizator.';
-				include '../error.html.php';
+				include 'error.html.php';
 				exit();			
 			}		
 		}
@@ -113,7 +120,7 @@ if (isset($_POST['action']) and $_POST['action']=='Edit')
 	if (!$result)
 		{
 		$error = 'Eroare la afisarea detaliilor pentru utilizator.';
-		include '../error.html.php';
+		include 'error.html.php';
 		exit();
 		}
 		$row = mysqli_fetch_array($result);
@@ -132,7 +139,7 @@ if (isset($_POST['action']) and $_POST['action']=='Edit')
 		if (!$result)
 		{
 			$error='Eroare la afisarea listei de roluri.';
-			include '../error.html.php';
+			include 'error.html.php';
 			exit();
 		}
 		
@@ -148,7 +155,7 @@ if (isset($_POST['action']) and $_POST['action']=='Edit')
 		if (!$result)
 		{
 			$error='Eroare la afisarea listei de roluri.';
-			include '../error.html.php';
+			include 'error.html.php';
 			exit();
 		}	
 		
@@ -180,7 +187,7 @@ if (isset($_GET['editform']))
 	if (!mysqli_query($link, $sql))
 		{
 			$error='Eroare la actualizarea datelor de utilizator.';
-			include '../error.html.php';
+			include 'error.html.php';
 			exit();
 		}
 
@@ -189,7 +196,7 @@ if (isset($_GET['editform']))
 		$password = md5($_POST['password'] . 'ijdb');
 		$password=mysqli_real_escape_string($link, $password);
 		$sql="UPDATE author SET
-			password='$password'
+			password='$password',
 			WHERE id='$id'";
 		if (mysqli_query($link, $sql))
 		{
@@ -216,7 +223,7 @@ if (isset($_GET['editform']))
 				roleid='$roleid'";
 			if (!mysqli_query($link, $sql))
 			{
-				$error = 'Eroare la alocarea catre utlizator a rolului selectat.';
+				$error = 'Eroare la alocarea catre utilizator a rolului selectat.';
 				include '../error.html.php';
 				exit();
 			}
@@ -245,7 +252,7 @@ if (isset($_POST['action']) and $_POST['action'] == 'Delete')
 		$result = mysqli_query($link, $sql);
 		if (!$result)
 		{
-			$error = 'Eroare la aducerea listei de carti pentru a fi sterse';
+			$error = 'Eroare la afisarea listei de carti pentru a fi sterse';
 			include 'error.html.php';
 			exit();
 		}
@@ -269,7 +276,7 @@ if (isset($_POST['action']) and $_POST['action'] == 'Delete')
 	$sql = "DELETE FROM book WHERE authorid='$id'";
 	if (!mysqli_query($link, $sql))
 	{
-		$error = 'Eroare stregerea cartii apartinand utilizatorului.';
+		$error = 'Eroare la stregerea cartii apartinand utilizatorului.';
 		include 'error.html.php';
 		exit();
 	}
@@ -278,7 +285,7 @@ if (isset($_POST['action']) and $_POST['action'] == 'Delete')
 	$sql = "DELETE FROM author WHERE id='$id'";
 	if (!mysqli_query($link, $sql))
 	{
-		$error = 'Eroare la stererea utilizatorului.';
+		$error = 'Eroare la stergerea utilizatorului.';
 		include 'error.html.php';
 		exit();
 	}		
@@ -292,7 +299,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/db.inc.php';
 $result = mysqli_query($link, 'SELECT id, name FROM author');
 if (!$result)
 {
-	$error = 'Error la aducerea utilizatorului din baza de date!';
+	$error = 'Eroare la afisarea utilizatorului din baza de date!';
 	include 'error.html.php';
 	exit();
 }	
@@ -301,5 +308,8 @@ while ($row = mysqli_fetch_array($result))
 {
 	$authors[] = array('id' => $row['id'], 'name' => $row['name']);
 }
+
+
+
 include 'authors.html.php';
 ?>

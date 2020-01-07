@@ -1,8 +1,9 @@
 <?php
-
 include_once $_SERVER['DOCUMENT_ROOT'].'/biblioteca/includes/magicquotes.inc.php';
 
 require_once $_SERVER['DOCUMENT_ROOT'].'/biblioteca/includes/access.inc.php';
+
+		  
 
 if (!userIsLoggedIn())
 {
@@ -19,15 +20,29 @@ if (!userHasRole('Administrator'))
 
 include_once $_SERVER['DOCUMENT_ROOT']. '/biblioteca/includes/magicquotes.inc.php';
 
+	
 if (isset($_GET['add']))
 {
-	$pagetitle='New Category';
-	$action='addform';
-	$name='';
-	$id='';
-	$button='Add category';
+		
+	//<div class="container">
 	
-	include 'form.html.php';
+				$pagetitle='Categorie noua';
+				$action='addform';
+			
+			$name='';
+           // <div  class="float-right">
+			$id='';
+			$button='Adauga categorie';
+			//</div>
+			
+	 include 'form.html.php';
+	 
+	//<div class="card mb-3 mt-3 shadow-sm" >
+    //<div class="card-body">
+	//</div>
+	//</div>
+	
+	
 	exit();
 }
 

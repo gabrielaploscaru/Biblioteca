@@ -20,12 +20,16 @@
 	<form action="?<?php htmlout($action); ?>" method="post">
 	<div>
 	  <label for="text"> Introduceti titlul cartii:</label>
-	  <textarea id="text" name="text" row="3" cols="40"><?php htmlout($text); ?></textarea>
+	  <textarea id="text" name="text" row="2" cols="30"><?php htmlout($text); ?></textarea>
 	</div>
 	<div>
-	  <label for="author">Editor:</label>
+	  <label for="text"> Introduceti autorul cartii:</label>
+	  <textarea id="text" name="text" row="2" cols="30"><?php htmlout($text); ?></textarea>
+	</div>
+	<div>
+	  <label for="author">Autor:</label>
 	  <select name="author" id="author">
-		<option value="">Select one</option>
+		<option value="">Selectati Editorul</option>
 		<?php foreach ($authors as $author): ?>
 			<option value="<?php htmlout($author['id']); ?>"<?php
      			if ($author['id']==$authorid)

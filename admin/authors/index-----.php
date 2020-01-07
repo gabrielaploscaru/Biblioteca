@@ -12,33 +12,24 @@ if (!userIsLoggedIn())
 //echo $_POST['email'];
 
 
-if (!userHasRole('Administrator'))
-{
-	$error='Doar utilizatorii cu drept de Administrator pot accesa aceasta pagina.';
-	include '../accessdenied.html.php';
-	include '../logout.html.php';
-	exit();
-}
-
-
 if (isset($_GET['add']))
 {
 	include $_SERVER['DOCUMENT_ROOT'].'/biblioteca/includes/db.inc.php';
-	$pagetitle='New Author';
+	$pagetitle='Adaugare Utilizator';
 	$action='addform';
 	$name='';
 	$pren='';
 	$email='';
 	$id='';
-	$button='Add author';
+	$button='Adauga utilizator';
 	
 	//Build the list of roles
 	$sql = "SELECT id, description FROM role";
 	$result=mysqli_query($link, $sql);
 	if(!$result)
 	{
-		$error ='Eroarela incarcarea listei de roluri';
-		include 'error.html.php';
+		$error ='Eroare la afisarea listei de roluri';
+		include '../error.html.php';
 		exit();
 	}
 
@@ -102,7 +93,7 @@ if (isset($_GET['addform']))
 			if (!mysqli_query($link,$sql))
 			{
 				$error='Eroare la stabilirea rolului pentru utilizator.';
-				include 'error.html.php';
+				include '../error.html.php';
 				exit();			
 			}		
 		}
@@ -122,7 +113,7 @@ if (isset($_POST['action']) and $_POST['action']=='Edit')
 	if (!$result)
 		{
 		$error = 'Eroare la afisarea detaliilor pentru utilizator.';
-		include 'error.html.php';
+		include '../error.html.php';
 		exit();
 		}
 		$row = mysqli_fetch_array($result);
@@ -141,7 +132,7 @@ if (isset($_POST['action']) and $_POST['action']=='Edit')
 		if (!$result)
 		{
 			$error='Eroare la afisarea listei de roluri.';
-			include 'error.html.php';
+			include '../error.html.php';
 			exit();
 		}
 		
@@ -157,7 +148,7 @@ if (isset($_POST['action']) and $_POST['action']=='Edit')
 		if (!$result)
 		{
 			$error='Eroare la afisarea listei de roluri.';
-			include 'error.html.php';
+			include '../error.html.php';
 			exit();
 		}	
 		
@@ -189,7 +180,7 @@ if (isset($_GET['editform']))
 	if (!mysqli_query($link, $sql))
 		{
 			$error='Eroare la actualizarea datelor de utilizator.';
-			include 'error.html.php';
+			include '../error.html.php';
 			exit();
 		}
 

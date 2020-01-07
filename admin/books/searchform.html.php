@@ -15,8 +15,7 @@
 		<form action="" method="get">
 			<p>Afisare carti dupa urmatorul criteriu:</p>
 			
-			
-			
+						
 			<div>
 				<label for="book">Dupa autor:</label>
 				<select name="book" id="book">
@@ -35,8 +34,7 @@
 				<select name="author" id="author">
 				  <option value="">Orice editor</option>
 				  <?php foreach ($authors as $author): ?>
-				    <option value="<?php htmlout($author['id']); ?>"><?php htmlout($author['name']); ?>
-					</option>
+				    <option value="<?php htmlout($author['id']); ?>"><?php htmlout($author['name']); ?></option>
 				   <?php endforeach; ?>
 				</select>
 			</div>

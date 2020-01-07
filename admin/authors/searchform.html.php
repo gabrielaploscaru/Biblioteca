@@ -12,7 +12,7 @@
 		<h1>-Administrare carti-</h1>
 		<p><a href="?add">Add new joke</a></p>
 		<form action="" method="get">
-			<p>Afisare carti care satisfac urmatorul criteriu:</p>
+			<p>Afisare carti dupa urmatorul criteriu:</p>
 			<div>
 				<label for="author">Dupa Autor:</label>
 				<select name="author" id="author">
@@ -34,7 +34,7 @@
 			   </select>
 			 </div>
 			<div>
-				<label for="text">Continand testul:</label>
+				<label for="text">Continand textul:</label>
 				<input type="text" name="text" id="text"/>
 			</div>
 			<div>
