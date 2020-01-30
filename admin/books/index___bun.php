@@ -22,7 +22,7 @@ if (!userHasRole('Editor'))
 if (isset($_GET['add']))
   {
 			
-	$pagetitle='Adauga carte noua';
+	$pagetitle='Adauga carte';
 	$action='addform';
 	$text='';
 	$autor='';
@@ -186,7 +186,7 @@ if (isset($_GET['addform']))
 				categoryid='$categoryid'";
 			if (!mysqli_query($link, $sql))
 			{
-				$error = 'Eroare la inserarea cartii la categoria selectata.';
+				$error = 'Error inserting book into selected category.';
 				include 'error.html.php';
 				exit();
 			}
@@ -219,7 +219,7 @@ if (isset($_GET['editform']))
 		WHERE id='$id'";
 	if (!mysqli_query($link, $sql))
 	{
-		$error = 'Eroare la actualizarea cartii.';
+		$error = 'Error updating submitted book.';
 		include 'error.html.php';
 		exit();
 	}
@@ -273,7 +273,7 @@ if (isset($_POST['action']) and $_POST['action'] == 'Delete')
 	$sql = "DELETE FROM book WHERE id='$id'";
 	if (!mysqli_query($link, $sql))
 	{
-		$error = 'Eroare la stergerea cartii.';
+		$error = 'Error deleting book.';
 		include 'error.html.php';
 		exit();
 	}
@@ -284,7 +284,7 @@ if (isset($_POST['action']) and $_POST['action'] == 'Delete')
 
 if (isset($_GET['action']) and $_GET['action'] == 'search')
  {
-	include $_SERVER['DOCUMENT_ROOT'].'/biblioteca/includes/db.inc.php';
+	include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/db.inc.php';
 	// The basic SELECT statement
 	$select = 'SELECT id, bookname';
 	$from = ' FROM book';
@@ -386,7 +386,7 @@ while ($row = mysqli_fetch_array($result))
 $result = mysqli_query($link, 'SELECT id, bookname, authorid, bookautor FROM book');
 if (!$result)
   {
-	$error = 'Eroare la afisarea cartilor din baza de date';
+	$error = 'Eroare la afisarea cartilor din baza de date!';
 	include '../error.html.php';
 	exit();
   }	
@@ -401,6 +401,6 @@ while ($row = mysqli_fetch_array($result))
 
 
 include  'searchform.html.php';
-include  'book.html.php';
+//include  'book.html.php';
   
 ?>

@@ -20,14 +20,14 @@
 	<form action="?<?php htmlout($action); ?>" method="post">
 	<div>
 	  <label for="text"> Introduceti titlul cartii:</label>
-	  <textarea id="text" name="text" row="2" cols="30"><?php htmlout($text); ?></textarea>
+	  <textarea id="text" name="text" row="2" cols="20"><?php htmlout($text); ?></textarea>
 	</div>
 	<div>
 	  <label for="text"> Introduceti autorul cartii:</label>
-	  <textarea id="text" name="text" row="2" cols="30"><?php htmlout($text); ?></textarea>
+	  <textarea id="text" name="text" row="2" cols="20"><?php htmlout($text); ?></textarea>
 	</div>
-	<div>
-	  <label for="author">Autor:</label>
+<!--	div>
+	<label for="author">Autor:</label>
 	  <select name="author" id="author">
 		<option value="">Selectati Editorul</option>
 		<?php foreach ($authors as $author): ?>
@@ -37,7 +37,7 @@
 			?>><?php htmlout($author['name']); ?></option>
 		 <?php endforeach; ?>
 	</select>
-	</div>
+    </div>-->
 	<fieldset>
 	 <legend>Categorie:</legend>
 	 <?php foreach ($categories as $category): ?>

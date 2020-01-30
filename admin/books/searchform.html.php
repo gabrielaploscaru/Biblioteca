@@ -10,25 +10,12 @@
 	</head>
 	
 	<body>
-		<h1>Administrare carti</h1>
-		<p><a href="?add"><h2>Adauga carte</h2></a></p>
+		<h1>-Administrare carti-</h1>
+		<p><a href="?add"><h2>Adauga carte noua</h2></a></p>
 		<form action="" method="get">
 			<p>Afisare carti dupa urmatorul criteriu:</p>
 			
-						
-			<div>
-				<label for="book">Dupa autor:</label>
-				<select name="book" id="book">
-				  <option value="">Orice autor</option>
-				  <?php foreach ($books as $book): ?>
-				    <option value="<?php htmlout($book['id']); ?>"><?php htmlout($book['bookautor']); ?>
-					</option>
-				   <?php endforeach; ?>
-				</select>
-			</div>
-			
-			
-			
+							
 			<div>
 				<label for="author">Dupa editor:</label>
 				<select name="author" id="author">
@@ -38,18 +25,20 @@
 				   <?php endforeach; ?>
 				</select>
 			</div>
+			
 			<div>
 			   <label for="category">Dupa categorie:</label>
 			   <select name="category" id="category">
-			   <option value="">Orice category</option>
+			   <option value="">Orice categorie</option>
 			   <?php foreach ($categories as $category): ?>
 			       <option value="<?php htmlout($category['id']); ?>"><?php
                           htmlout($category['name']); ?></option>
                <?php endforeach; ?>
 			   </select>
 			</div>
+			
 			<div>
-				<label for="text">Continand in titlu textul:</label>
+				<label for="text">Contine in titlu urmatorul text:</label>
 				<input type="text" name="text" id="text"/>
 			</div>
 			<div>

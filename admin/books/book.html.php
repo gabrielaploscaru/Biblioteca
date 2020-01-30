@@ -19,17 +19,17 @@
 	
 	
 	<body>
-	<h1> Rezultatul cautarii</h1>
-	<?php if (isset($jokes)): ?>
+	<h1>Rezultatul cautarii</h1>
+	<?php if (isset($books)): ?>
 	<table>
 	  <tr><th>Titlul cartii</th><th>Optiuni</th></tr>
-	  <?php foreach ($jokes as $joke): ?>
+	  <?php foreach ($books as $book): ?>
 	  <tr valign="top">
-		<td><?php bbcodeout($joke['text']); ?></td>
+		<td><?php bbcodeout($book['text']); ?></td>
 		<td>
 		<form action="?" method="post"
 		<div>
-		  <input type="hidden" name='id' value="<?php htmlout($joke['id']); ?>"/>
+		  <input type="hidden" name='id' value="<?php htmlout($book['id']); ?>"/>
 		  <input type="submit" name='action' value="Edit"/>
 		  <input type="submit" name='action' value="Delete"/>
 		</div>
