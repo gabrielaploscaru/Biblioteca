@@ -11,9 +11,12 @@
 	
 	<body>
 		<h1>-Administrare carti-</h1>
-		<p><a href="?add"><h2>Adauga carte noua</h2></a></p>
+		<br>
+		<br>
+		<p><a href="?add"><h4>Adauga carte noua</h4></a></p>
+		<br>
 		<form action="" method="get">
-			<p>Afisare carti dupa urmatorul criteriu:</p>
+			<p><h4>Afisare carti dupa urmatorul criteriu:</h4></p>
 			
 							
 			<div>
