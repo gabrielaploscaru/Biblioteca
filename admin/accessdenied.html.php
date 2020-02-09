@@ -8,7 +8,15 @@
 		<meta http-equiv="content-type"
 			content="text/html; charset=utf-8"/>
 	</head>
+	
+		
 	<body>
+	
+	<style>
+		body {
+		  background-color: rgb(214, 209, 211);
+		}
+	</style>
 		<h1>Acces refuzat</h1>
 		<p><?php echo htmlout($error); ?></p>
 	</body>

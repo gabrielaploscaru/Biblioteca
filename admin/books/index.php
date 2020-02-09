@@ -4,403 +4,243 @@ include_once $_SERVER['DOCUMENT_ROOT'].'/biblioteca/includes/magicquotes.inc.php
 
 require_once $_SERVER['DOCUMENT_ROOT'].'/biblioteca/includes/access.inc.php';
 
-if (!userIsLoggedIn())
-	{
-		include '../login.html.php';
-		exit();
-	}
 
-if (!userHasRole('Editor'))
-	{
-		$error='Doar utilizatorii cu drept de Editor pot accesa aceasta pagina.';
-		include '../accessdenied.html.php';
-		include '../logout.html.php';
-		exit();
-	}
-	
-	
-if (isset($_GET['add']))
-  {
-			
-	$pagetitle='Adauga carte noua';
-	$action='addform';
-	$text='';
-	$autor='';
-	$authorid='';
-	$id='';
-	$button='Adauga';
-
-	
-	if (isset($_GET['add']))
-	{	
-	include $_SERVER['DOCUMENT_ROOT'].'/biblioteca/includes/db.inc.php';
-		
-	//Build the list of authors
-	$sql="SELECT id, name FROM author";
-	$result = mysqli_query($link, $sql);
-	if (!$result)
-		{
-		$error='Eroare la afisarea listei de editori.';
-		include 'error.html.php';
-		exit();
-		}
-
-	while ($row=mysqli_fetch_array($result))
-		{
-		$authors[]=array('id'=>$row['id'], 'name'=>$row['name']);
-		}
-
-	//Build the list of categories
-	$sql="SELECT id, name FROM category";
-	$result=mysqli_query($link, $sql);
-	if (!$result)
-		{
-		$error='Eroare la afisarea listei de categorii.';
-		include 'error.html.php';
-		exit();
-		}
-
-	while ($row=mysqli_fetch_array($result))
-		{
-		$categories[]=array(
-			'id'=>$row['id'],
-			'name'=>$row['name'],
-			'selected'=>FALSE);
-		}
-
-	include 'form.html.php';
-	exit();
-   }
-   
-  }
-
-
-if (isset($_POST['action']) and $_POST['action'] == 'Edit')
-  {
-	include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/db.inc.php';
-	
-	$id = mysqli_real_escape_string($link, $_POST['id']);
-	$sql = "SELECT id, bookname, bookautor, authorid FROM book WHERE id='$id'";
-	$result = mysqli_query($link, $sql);
-	if (!$result)
-    {
-		$error = 'Eroare la afisarea detaliilor despre carte.';
-		include 'error.html.php';
-		exit();
-    }
-	$row = mysqli_fetch_array($result);
-	
-	$pagetitle = 'Editare Carte';
-	$action = 'editform';
-	$text = $row['bookname'];
-	$authorid = $row['authorid'];
-	$id = $row['id'];
-	$button = 'Actualizeaza carte';
-	
-	// Build the list of authors
-	$sql = "SELECT id, name FROM author";
-	$result = mysqli_query($link, $sql);
-	if (!$result)
-	{
-		$error = 'Eroare la afisarea listei de editori.';
-		include 'error.html.php';
-		exit();
-	}
-	
-	while ($row = mysqli_fetch_array($result))
-	{
-		$authors[] = array('id' => $row['id'], 'name' => $row['name']);
-	}
-
-	// Get list of categories containing this book
-	$sql = "SELECT categoryid FROM bookcategory WHERE bookid='$id'";
-	$result = mysqli_query($link, $sql);
-	if (!$result)
-	{
-		$error = 'Eroare la afisarea listei de categorii selectate.';
-		include 'error.html.php';
-		exit();
-	}
-	
-	while ($row = mysqli_fetch_array($result))
-	{
-		$selectedCategories[] = $row['categoryid'];
-	}
-	
-	// Build the list of all categories
-	$sql = "SELECT id, name FROM category";
-	$result = mysqli_query($link, $sql);
-	if (!$result)
-	{
-		$error = 'Eroare la afisarea listei de categorii.';
-		include 'error.html.php';
-		exit();
-	}
-	
-	while ($row = mysqli_fetch_array($result))
-    {
-		$categories[] = array(
-			'id' => $row['id'],
-			'name' => $row['name'],
-			'selected' => in_array($row['id'], $selectedCategories));
-	}
-	include 'form.html.php';
-	exit();
-  }
-	
-if (isset($_GET['addform']))
-  {
-	include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/db.inc.php';
-	
-	$text = mysqli_real_escape_string($link, $_POST['text']);
-	$author = mysqli_real_escape_string($link, $_POST['author']);
-	
-	if ($author == '')
-	{
-		$error = 'Trebuie sa alegi un !!!!!! Editor--AUTOR pentru aceasta carte.
-			Click &lsquo;back&rsquo; and try again.';
-		include 'error.html.php';
-		exit();
-	}
-	
-	$sql = "INSERT INTO book SET
-		bookname='$text',
-		bookdate=CURDATE(),
-		authorid='$author'";
-	if (!mysqli_query($link, $sql))
-	{
-		$error = 'Eroare la adaugarea cartii.';
-		include 'error.html.php';
-		exit();
-  }
-	
-	$bookid = mysqli_insert_id($link);
-	
-	if (isset($_POST['categories']))
-	{
-		foreach ($_POST['categories'] as $category)
-		{
-			$categoryid = mysqli_real_escape_string($link, $category);
-			$sql = "INSERT INTO bookcategory SET
-				bookid='$bookid',
-				categoryid='$categoryid'";
-			if (!mysqli_query($link, $sql))
-			{
-				$error = 'Eroare la inserarea cartii la categoria selectata.';
-				include 'error.html.php';
-				exit();
-			}
-		}
-	}
-	
-	header('Location: .');
-	exit();
- }	
-	
-if (isset($_GET['editform']))
- {
-	include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/db.inc.php';
-	
-	$text = mysqli_real_escape_string($link, $_POST['text']);
-	$author = mysqli_real_escape_string($link, $_POST['author']);
-	$id = mysqli_real_escape_string($link, $_POST['id']);
-	
-	if ($author == '')
-	{
-		$error = 'You must choose an author for this book.
-			Click &lsquo;back&rsquo; and try again.';
-		include 'error.html.php';
-		exit();
-	}
-	
-	$sql = "UPDATE book SET
-		booktext='$text',
-		authorid='$author'
-		WHERE id='$id'";
-	if (!mysqli_query($link, $sql))
-	{
-		$error = 'Eroare la actualizarea cartii.';
-		include 'error.html.php';
-		exit();
-	}
-	
-	$sql = "DELETE FROM bookcategory WHERE bookid='$id'";
-	if (!mysqli_query($link, $sql))
-	{
-		$error = 'Error removing obsolete book category entries.';
-		include 'error.html.php';
-		exit();
-    }
-  }
-  
-if (isset($_POST['categories']))
-	
-  {
-	  foreach ($_POST['categories'] as $category)
-		{
-		$categoryid = mysqli_real_escape_string($link, $category);
-		$sql = "INSERT INTO bookcategory SET
-			bookid='$id',
-			categoryid='$categoryid'";
-		if (!mysqli_query($link, $sql))
-			{
-			$error = 'Error inserting book into selected category.';
-			include 'error.html.php';
-			exit();
-			}
-		}
-	
-	  header('Location: .');
-	  exit();
-   }
-
-   
-if (isset($_POST['action']) and $_POST['action'] == 'Delete')
- {
-		include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/db.inc.php';
-		$id = mysqli_real_escape_string($link, $_POST['id']);
-		
-	// Delete category assignments for this book
-	$sql = "DELETE FROM bookcategory WHERE bookid='$id'";
-	if (!mysqli_query($link, $sql))
-	{
-		$error = 'Error removing book from categories.';
-		include 'error.html.php';
-		exit();
-	}
-	
-	// Delete the book
-	$sql = "DELETE FROM book WHERE id='$id'";
-	if (!mysqli_query($link, $sql))
-	{
-		$error = 'Eroare la stergerea cartii.';
-		include 'error.html.php';
-		exit();
-	}
-	header('Location: .');
-	exit();
- }
-
-
-if (isset($_GET['action']) and $_GET['action'] == 'search')
- {
-	include $_SERVER['DOCUMENT_ROOT'].'/biblioteca/includes/db.inc.php';
-	// The basic SELECT statement
-	$select = 'SELECT id, bookname';
-	$from = ' FROM book';
-	$where = ' WHERE TRUE';
-	
-	$authorid = mysqli_real_escape_string($link, $_GET['author']);
-	if ($authorid != '') // An author is selected
-	{
-		$where .= " AND authorid='$authorid'";
-	}
-
-	$categoryid = mysqli_real_escape_string($link,$_GET['category']);
-	if ($categoryid != '') // A category is selected
-	{
-		$from .= ' INNER JOIN bookcategory ON id = bookid';
-		$where .= " AND categoryid='$categoryid'";
-	}
-	
-	$text = mysqli_real_escape_string($link, $_GET['text']);
-	if ($text != '') // Some search text was specified
-	{
-		$where .= " AND bookname LIKE '%$text%'";
-	}
-	
-	$result = mysqli_query($link, $select . $from . $where);
-	if (!$result)
-	{
-		$error = 'Eroare la afisarea cartilor.';
-		include 'error.html.php';
-		exit();
-	}
-	while ($row = mysqli_fetch_array($result))
-	{
-		$books[] = array('id' => $row['id'], 'text' => $row['bookname']);
-	}
-	
-	include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/db.inc.php';
-	$result = mysqli_query($link, 'SELECT id, name FROM category');
-	if (!$result)	
-	{
-		$error='Eroare la afisarea categoriilor din baza de date!';
-		include 'error.html.php';
-		exit();
-	}	
-
-	while ($row=mysqli_fetch_array($result))
-	{
-		$categories[]=array('id'=>$row['id'], 'name'=>$row['name']);
-		
-	}
-	$result = mysqli_query($link, 'SELECT id, name FROM author');
-	if (!$result)
-	{
-		$error = 'Eroare la afisarea editorilor  din baza de date!';
-		include 'error.html.php';
-		exit();
-	}	
-
-	while ($row = mysqli_fetch_array($result))
-	{
-		$authors[] = array('id' => $row['id'], 'name' => $row['name']);
-	}
-	
-	
-	include  'searchform.html.php';
-	include  'book.html.php';
-	exit();
- }
-
-
-// Display searchform
 include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/db.inc.php';
-$result = mysqli_query($link, 'SELECT id, name FROM category');
-if (!$result)	
-{
-	$error='Eroare la afisarea categoriilor din baza de date!';
-	include 'error.html.php';
-	exit();
-}	
 
-while ($row=mysqli_fetch_array($result))
-{
-	$categories[]=array('id'=>$row['id'], 'name'=>$row['name']);
-}
 
-$result = mysqli_query($link, 'SELECT id, name FROM author');
+
+$sql = 'SELECT id, bookname, bookautor, filename, mimetype, description, cover_url FROM book';
+$result = mysqli_query($link, $sql);
 if (!$result)
 {
-	$error = 'Eroare la afisarea editorilor din baza de date!';
-	include 'error.html.php';
-	exit();
-}	
-
-while ($row = mysqli_fetch_array($result))
-{
-	$authors[] = array('id' => $row['id'], 'name' => $row['name']);
+  $error = 'Database error fetching stored files.';
+  include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/error.html.php';
+  exit();
 }
 
-$result = mysqli_query($link, 'SELECT id, bookname, authorid, bookautor FROM book');
-if (!$result)
-  {
-	$error = 'Eroare la afisarea cartilor din baza de date';
-	include '../error.html.php';
-	exit();
-  }	
-
-  
+$files = array();
 while ($row = mysqli_fetch_array($result))
+{
+  $files[] = array(
+      'id' => $row['id'],
+	  'bookname' => $row['bookname'],
+	  'bookautor' =>$row['bookautor'],
+      'filename' => $row['filename'],
+      'mimetype' => $row['mimetype'],
+      'description' => $row['description'],
+	  'cover_url' => $row['cover_url']);
+}
+
+
+
+
+if (isset($_POST['action']) and $_POST['action'] == 'upload')
+{
+  // Bail out if the file isn't really an upload
+  if (!is_uploaded_file($_FILES['upload']['tmp_name']))
   {
-	  
-	 // print_r($row);
-	$books[] = array('id' => $row['id'], 'text' => $row['bookname'], 'authorid' => $row['authorid'], 'bookautor' => $row['bookautor'] );
+    $error = 'There was no file uploaded!';
+    include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/error.html.php';
+	exit();
   }
-
-
-include  'searchform.html.php';
-include  'book.html.php';
   
+  
+  
+  $uploadfile = $_FILES['upload']['tmp_name'];
+  $uploadname = $_FILES['upload']['name'];
+  $uploadtype = $_FILES['upload']['type'];
+  $uploaddesc = $_POST['desc'];
+  $uploadbname = $_POST['bname'];
+  $uploadautor = $_POST['bauth'];
+  
+  if($_FILES['upload']['size'] >= 1000000) {
+	  echo "Fisierul are dimensiune prea mare";
+	  exit();
+  }
+  
+  $uploaddata = file_get_contents($uploadfile);
+  
+  include $_SERVER['DOCUMENT_ROOT'] .'/biblioteca/includes/db.inc.php';
+ 
+  // Prepare user-submitted values for safe database insert
+  $uploadname = mysqli_real_escape_string($link, $uploadname);
+  $uploadtype = mysqli_real_escape_string($link, $uploadtype);
+  $uploaddesc = mysqli_real_escape_string($link, $uploaddesc);
+  $uploaddata = mysqli_real_escape_string($link, $uploaddata);
+  $uploadbname = mysqli_real_escape_string($link, $uploadbname);
+  $uploadautor = mysqli_real_escape_string($link, $uploadautor);
+  
+  
+  $sql = "INSERT INTO book SET
+      filename = '$uploadname',
+      mimetype = '$uploadtype',
+      description ='$uploaddesc',
+      filedata = '$uploaddata',
+	  bookname = '$uploadbname',
+	  bookautor = '$uploadautor'";
+
+  
+  if (!mysqli_query($link, $sql))
+  {
+    $error = 'Database error storing file!';
+    include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/error.html.php';
+    exit();
+  }
+  
+  header('Location: .');
+  exit();
+}
+
+if (isset($_GET['action']) and
+    ($_GET['action'] == 'view' or $_GET['action'] == 'download') and
+    isset($_GET['id']))
+{
+ 
+  include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/db.inc.php';
+  
+  $id = mysqli_real_escape_string($link, $_GET['id']);
+  
+  $sql = "SELECT bookname, bookautor, filename, mimetype, filedata
+      FROM book
+      WHERE id = '$id'";
+  $result = mysqli_query($link, $sql);
+  if (!$result)
+  {
+    $error = 'Database error fetching requested file.';
+    include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/error.html.php';
+    exit();
+  }
+  
+  $file = mysqli_fetch_array($result);
+  if (!$file)
+  {
+    $error = 'File with specified ID not found in the database!';
+    include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/error.html.php';
+    exit();
+  }
+  $bookname = $file['bookname'];
+  $bookautor = $file['bookautor'];
+  $filename = $file['filename'];
+  $mimetype = $file['mimetype'];
+  $filedata = $file['filedata'];
+  $disposition = 'inline';
+  
+  if ($_GET['action'] == 'download')
+  {
+    $mimetype = 'x-download';
+    $disposition = 'attachment';
+  }
+  
+  // Content-type must come before Content-disposition
+  header("Content-type: $mimetype");
+  header("Content-disposition: $disposition; filename=$filename");
+  header('Content-length: ' . strlen($filedata));
+  
+  echo $filedata;
+  exit();
+}
+
+if (isset($_POST['action']) and $_POST['action'] == 'delete' and
+    isset($_POST['id']))
+{
+  
+  include $_SERVER['DOCUMENT_ROOT'] .'/biblioteca/includes/db.inc.php';
+  
+  $id = mysqli_real_escape_string($link, $_POST['id']);
+  
+  $sql = "DELETE FROM book
+      WHERE id = '$id'";
+  if (!mysqli_query($link, $sql))
+  {
+    $error = 'Database error deleting requested file.';
+    include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/error.html.php';
+    exit();
+  }
+  header('Location: .');
+  exit();
+}
+
+
+include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/db.inc.php';
+
+include 'files.html.php';
+
+if( isset($_GET['action']) && $_GET['action'] == 'add_photo_to_item' ) {
+
+
+	//include 'files.html.php';
+	include 'cover_upload_form.html.php';
+		
+	exit();
+}
+
+	
+if(isset($_GET['add_pictures'])) 
+	{
+		$item_id = $_POST['item_id'];
+		//echo $item_id;
+		//echo $_FILES['files']['name'][0];
+		//echo $item_id;
+		
+		if(!empty($_FILES['files']['name'][0])){
+			$files2 = $_FILES['files'];
+			$uploaded = array();
+			$failed   = array();
+			
+			$allowed  = array('jpg', 'png', 'jpeg');
+			
+			foreach($files2['name'] as $position => $file_name){
+				$file_tmp   = $files2['tmp_name'][$position];
+				$file_size  = $files2['size'][$position];
+				$file_error = $files2['error'][$position];
+
+				$file_ext = explode('.', $file_name);
+				$file_ext = strtolower(end($file_ext));
+				
+				if(in_array($file_ext, $allowed)){
+					if($file_error === 0){
+						if($file_size <= 1000000){
+							$file_name_new = uniqid('', true) . '.' . $file_ext;
+							$file_destination = '/biblioteca/admin/books/cover_images/' . $file_name_new;
+				
+							
+							$file_destination_transfer = $_SERVER['DOCUMENT_ROOT'] .$file_destination;
+							
+							include $_SERVER['DOCUMENT_ROOT'] .'/biblioteca/includes/db.inc.php';
+							
+							$sql = "UPDATE book SET cover_url = '$file_destination' WHERE id = '$item_id'";
+							$result = mysqli_query($link, $sql);
+							
+							//echo "/".$file_destination."/";
+							//echo "<br/>";
+							if(move_uploaded_file($file_tmp, $file_destination_transfer)){
+								$uploaded[$position] = $file_destination_transfer;
+							}else{
+								$failed[$position] = "[{$file_name}] failed to upload";
+							}
+						}else{
+							$failed[$position] = "[{$file_name}] is too large";
+						}
+					}else{
+						$failed[$position] = "[{$file_name}] failed to upload";
+					}
+				}else{
+					$failed[$position] = "[{$file_name}] file extension '{$file_ext}' is not allowed";
+				}
+			}
+			
+			//if(!empty($uploaded)){
+			//	print_r($uploaded);
+			//}	
+			
+			//if(!empty($failed)){
+			//	print_r($failed);
+			//}
+		}
+	
+   //header('Location: .');
+	exit();
+   }
+     
+//include 'files.html.php';
 ?>

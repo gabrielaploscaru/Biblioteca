@@ -1,7 +1,37 @@
 <?php
-include_once $_SERVER['DOCUMENT_ROOT'] .
-    '/biblioteca/includes/magicquotes.inc.php';
-	
+include_once $_SERVER['DOCUMENT_ROOT'].'/biblioteca/includes/navbar.html.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/biblioteca/includes/magicquotes.inc.php';
+
+require_once $_SERVER['DOCUMENT_ROOT'].'/biblioteca/includes/access.inc.php';
+
+
+include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/db.inc.php';
+
+
+
+$sql = 'SELECT id, bookname, bookautor, filename, mimetype, description, cover_url FROM book';
+$result = mysqli_query($link, $sql);
+if (!$result)
+{
+  $error = 'Database error fetching stored files.';
+  include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/error.html.php';
+  exit();
+}
+
+$files = array();
+while ($row = mysqli_fetch_array($result))
+{
+  $files[] = array(
+      'id' => $row['id'],
+	  'bookname' => $row['bookname'],
+	  'bookautor' =>$row['bookautor'],
+      'filename' => $row['filename'],
+      'mimetype' => $row['mimetype'],
+      'description' => $row['description'],
+	  'cover_url' => $row['cover_url']);
+}
+
+
 
 
 if (isset($_POST['action']) and $_POST['action'] == 'upload')
@@ -13,10 +43,21 @@ if (isset($_POST['action']) and $_POST['action'] == 'upload')
     include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/error.html.php';
 	exit();
   }
+  
+  
+  
   $uploadfile = $_FILES['upload']['tmp_name'];
   $uploadname = $_FILES['upload']['name'];
   $uploadtype = $_FILES['upload']['type'];
   $uploaddesc = $_POST['desc'];
+  $uploadbname = $_POST['bname'];
+  $uploadautor = $_POST['bauth'];
+  
+  if($_FILES['upload']['size'] >= 1000000) {
+	  echo "Fisierul are dimensiune prea mare";
+	  exit();
+  }
+  
   $uploaddata = file_get_contents($uploadfile);
   
   include $_SERVER['DOCUMENT_ROOT'] .'/biblioteca/includes/db.inc.php';
@@ -26,13 +67,19 @@ if (isset($_POST['action']) and $_POST['action'] == 'upload')
   $uploadtype = mysqli_real_escape_string($link, $uploadtype);
   $uploaddesc = mysqli_real_escape_string($link, $uploaddesc);
   $uploaddata = mysqli_real_escape_string($link, $uploaddata);
+  $uploadbname = mysqli_real_escape_string($link, $uploadbname);
+  $uploadautor = mysqli_real_escape_string($link, $uploadautor);
+  
   
   $sql = "INSERT INTO book SET
       filename = '$uploadname',
       mimetype = '$uploadtype',
       description ='$uploaddesc',
-      filedata = '$uploaddata'";
-	  
+      filedata = '$uploaddata',
+	  bookname = '$uploadbname',
+	  bookautor = '$uploadautor'";
+
+  
   if (!mysqli_query($link, $sql))
   {
     $error = 'Database error storing file!';
@@ -53,7 +100,7 @@ if (isset($_GET['action']) and
   
   $id = mysqli_real_escape_string($link, $_GET['id']);
   
-  $sql = "SELECT filename, mimetype, filedata
+  $sql = "SELECT bookname, bookautor, filename, mimetype, filedata
       FROM book
       WHERE id = '$id'";
   $result = mysqli_query($link, $sql);
@@ -71,6 +118,8 @@ if (isset($_GET['action']) and
     include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/error.html.php';
     exit();
   }
+  $bookname = $file['bookname'];
+  $bookautor = $file['bookautor'];
   $filename = $file['filename'];
   $mimetype = $file['mimetype'];
   $filedata = $file['filedata'];
@@ -78,7 +127,7 @@ if (isset($_GET['action']) and
   
   if ($_GET['action'] == 'download')
   {
-    $mimetype = 'application/x-download';
+    $mimetype = 'x-download';
     $disposition = 'attachment';
   }
   
@@ -90,6 +139,7 @@ if (isset($_GET['action']) and
   echo $filedata;
   exit();
 }
+
 if (isset($_POST['action']) and $_POST['action'] == 'delete' and
     isset($_POST['id']))
 {
@@ -110,54 +160,39 @@ if (isset($_POST['action']) and $_POST['action'] == 'delete' and
   exit();
 }
 
-include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/db.inc.php';
 
-$sql = 'SELECT id, filename, mimetype, description, cover_url FROM book';
-$result = mysqli_query($link, $sql);
-if (!$result)
-{
-  $error = 'Database error fetching stored files.';
-  include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/error.html.php';
-  exit();
-}
-$files = array();
-while ($row = mysqli_fetch_array($result))
-{
-  $files[] = array(
-      'id' => $row['id'],
-      'filename' => $row['filename'],
-      'mimetype' => $row['mimetype'],
-      'description' => $row['description'],
-	  'cover_url' => $row['cover_url']);
-}
+include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/db.inc.php';
 
 include 'files.html.php';
 
 if( isset($_GET['action']) && $_GET['action'] == 'add_photo_to_item' ) {
-	
+
+
+	//include 'files.html.php';
 	include 'cover_upload_form.html.php';
-	
+		
 	exit();
 }
 
 	
-if(isset($_GET['add_pictures'])) {
+if(isset($_GET['add_pictures'])) 
+	{
 		$item_id = $_POST['item_id'];
 		//echo $item_id;
 		//echo $_FILES['files']['name'][0];
 		//echo $item_id;
 		
 		if(!empty($_FILES['files']['name'][0])){
-			$files = $_FILES['files'];
+			$files2 = $_FILES['files'];
 			$uploaded = array();
 			$failed   = array();
 			
 			$allowed  = array('jpg', 'png', 'jpeg');
 			
-			foreach($files['name'] as $position => $file_name){
-				$file_tmp   = $files['tmp_name'][$position];
-				$file_size  = $files['size'][$position];
-				$file_error = $files['error'][$position];
+			foreach($files2['name'] as $position => $file_name){
+				$file_tmp   = $files2['tmp_name'][$position];
+				$file_size  = $files2['size'][$position];
+				$file_error = $files2['error'][$position];
 
 				$file_ext = explode('.', $file_name);
 				$file_ext = strtolower(end($file_ext));
@@ -202,8 +237,10 @@ if(isset($_GET['add_pictures'])) {
 			//	print_r($failed);
 			//}
 		}
-		
+	
+   //header('Location: .');
 	exit();
-} 
-
+   }
+     
+//include 'files.html.php';
 ?>

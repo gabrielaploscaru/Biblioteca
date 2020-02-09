@@ -1,147 +1,109 @@
 
-<?php include_once $_SERVER['DOCUMENT_ROOT'].'/biblioteca/includes/navbar.html.php'; ?>
-		
-	
-		
-<div class="container">
+  
+<?php 
 
-<br/>
+include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/db.inc.php';
 	
- <h6>Cautare </h6>
-    <div class="row">
-        <div class="col-md-12">
-            <form action="?search" accept-charset="UTF-8" method="get">
-                <div class="input-group">
-                    <input type="text" 
-						   name="search" 
-						   id="search" 
-						   placeholder="Cautare dupa titlu sau autor"  
-						   class="form-control">
-                    <span class="input-group-btn">
-                        <input type="submit"  class="btn btn-primary">
-                     </span>
-                </div>
-            </form>
-        </div>
-    </div>
+		
+if(isset($_GET['search'])) 
+{
+	$search_var = $_GET['search'];
 
- <!--	<div class="input-group">
-    <input type="text" class="form-control" placeholder="Search this blog">
-    <div class="input-group-append">
-      <button class="btn btn-secondary" type="button">
-        <i class="icon-search"></i>
-      </button>
-    </div> -->
-	
-	<br/>
-	<br/>
 
-	
-	
-	<div class="row">
-		<?php 
-		
-	include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/db.inc.php';
-	
-		
-	if(isset($_GET['search'])) {
-		$search_var = $_GET['search'];
-		
-		
-		$sql_search = "SELECT * FROM book WHERE bookname LIKE '%$search_var%'";
-		$search_res = mysqli_query($link, $sql_search);		
+	$sql_search = "SELECT * FROM book WHERE bookname LIKE '%$search_var%'";
+	$search_res = mysqli_query($link, $sql_search);		
 
-		
-		
-		if (!$search_res)
-		{
-			$error = 'Eroare la cautarea cartilor.';
-			include 'includes/error.html.php';
-			exit();
-		}		
-					
-		$array_results = array();
-		
-		
-		
-		while ($row = mysqli_fetch_array($search_res))
-		{
-			$array_results[] = 
-					array('id' => $row['id'], 
-						  'name' => $row['bookname'],
-						  'author' => $row['bookautor'],
-						  'cover_url' => $row['cover_url']
-						 );
-		}
-	
-					// creezi array care va contine fraza din search descompusa in cuvinte
-					// ceva gen $array_key_words = explode($searchvar, " ");
-				
-					// foreach($array_key_words as ..) { }
-				
-	
-				
-				//$array_results = array();
-				
-				//$sql_search = 'SELECT * FROM AUTHOR ... LIKE ''';
-				
-				//$search_res = myslqi_query($link, $sql_search);
-				
-				//$num_rows = mysqli_num_rows($search_res);
-				
-				
-				//while($row = ) {
-					//$array
-				//
-				
-				//if($num_rows == 0) 					
-				//}
-			
-			  //print_r($array_results);
-			  ?>
-				
-			
-	<?php foreach($array_results as $row):?>			
-			  
-			 <div class="col-sm-3">
-				<div class="card" style="width: 14rem;">
-				  <img src="<?php echo $row['cover_url']?>" class="card-img-top" alt="...">
-				  <div class="card-body">
-					<h5 class="card-title"><?php echo $row['name'];?></h5>
-					<p class="card-text"><?php echo $row['author'];?></p>
-					<a href="#" class="btn btn-primary">Download</a>
-				  </div>
-				</div>
-			  </div>
-	
-	
-	<?php 
-		  endforeach;
+
+
+	if (!$search_res)
+	{
+		$error = 'Eroare la cautarea cartilor.';
+		include 'includes/error.html.php';
 		exit();
+	}		
+				
+	$array_results = array();
+
+
+	while ($row = mysqli_fetch_array($search_res))
+	{
+		$array_results[] = 
+				array('id' => $row['id'], 
+					  'bookname' => $row['bookname'],
+					  'bookautor' => $row['bookautor'],
+					  'cover_url' => $row['cover_url']
+					 );
 	}
-	?>
 	
-	<?php
-		$sql_all_books = "SELECT * FROM book WHERE 1";
-		$res_all = mysqli_query($link, $sql_all_books);
+	
+	include 'pagina_principala.html.php';
+	exit();	
+}
+
 		
-		while($row = mysqli_fetch_array($res_all)) {
-	?>
-			<div class="col-sm-3">
-				<div class="card" style="width: 14rem;">
-				  <img src="<?php echo $row['cover_url']?>" class="card-img-top" alt="...">
-				  <div class="card-body">
-					<h5 class="card-title"><?php echo $row['bookname'];?></h5>
-					<p class="card-text"><?php echo $row['bookautor'];?></p>
-					<a href="#" class="btn btn-primary">Download</a>
-				  </div>
-				</div>
-			  </div>
-	<?php
-		}
-	?>
+		
+	if (isset($_GET['action']) &&  $_GET['action'] == 'download' )
+	 {
+		  include 'includes/db.inc.php';
+		  $id = mysqli_real_escape_string($link, $_GET['id']);
+		  $sql = "SELECT bookname, filename, mimetype, filedata
+			  FROM book
+			  WHERE id = '$id'";
+		  $result = mysqli_query($link, $sql);
+		  if (!$result)
+		  {
+			$error = 'Database error fetching requested file.';
+			include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/error.html.php';
+			exit();
+		  }
+		  $file = mysqli_fetch_array($result);
+		  if (!$file)
+		  {
+			$error = 'File with specified ID not found in the database!';
+			include $_SERVER['DOCUMENT_ROOT'] . '/biblioteca/includes/error.html.php';
+			exit();
+		  }
+		  $bookname = $file['bookname'];
+		  $filename = $file['filename'];
+		  $mimetype = $file['mimetype'];
+		  $filedata = $file['filedata'];
+		  $disposition = 'inline';
+		  
+		  if ($_GET['action'] == 'download')
+		  {
+			$mimetype = 'application/x-download';
+			$disposition = 'attachment';
+		  }
+		  // Content-type must come before Content-disposition
+		  header("Content-type: $mimetype");
+		  header("Content-disposition: $disposition; filename=$filename");
+		  header('Content-length: ' . strlen($filedata));
+		  
+		  
+		  
+		  echo $filedata;
+		  exit();
+	}
 	
-	</div>
-</div>
+$sql_all_books = "SELECT * FROM book WHERE 1";
+$res_all = mysqli_query($link, $sql_all_books);
+
+$array_results = array();
+
+while($row = mysqli_fetch_array($res_all)) {
+
+	$array_results[] = 
+		array('id' => $row['id'], 
+			  'bookname' => $row['bookname'],
+			  'bookautor' => $row['bookautor'],
+			  'cover_url' => $row['cover_url']
+			 );
+
+}
+	
+include 'pagina_principala.html.php';
+
+?>
+
 
 	

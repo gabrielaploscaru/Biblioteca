@@ -7,9 +7,28 @@
   <title>Administrarea utilizatorilor</title>
   <meta http-equiv="content-type"
     content="text/html; charset=utf-8"/>
+	  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	
 </head>
+
+
 <body>
-	<h1>Administrarea utilizatorilor</h1>
+
+       <style>
+		body {
+		  background-color: rgb(245, 244, 226);
+		}
+		</style>
+		
+	
+
+   <div class="container">
+	<h1>Administrare utilizatori</h1>
+	
+	<br>
+	<br>
 	<p><a href="?add">Adauga utilizator</a></p>
 	<ul>
 		<?php foreach ($authors as $author): ?>
@@ -26,7 +45,12 @@
 		</li>
 	<?php endforeach; ?>
 	</ul>
+	<br>
+	<br>
    <p><a href="..">Inapoi la Bibioteca</a></p>
+   <br>
    <?php include '../logout.html.php'; ?>
+   
+   </div>
  </body>
 </html>

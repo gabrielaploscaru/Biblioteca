@@ -1,4 +1,4 @@
-<?php include_once $_SERVER['DOCUMENT_ROOT']. '/teste_ijdb/includes/helpers.inc.php';?>
+<?php include_once $_SERVER['DOCUMENT_ROOT']. '/biblioteca/includes/helpers.inc.php';?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -15,6 +15,12 @@
 			<!-- pana aici -->
 	</head>
 	<body>
+	
+	<style>
+		body {
+		  background-color: rgb(245, 244, 226);
+		}
+	</style>
 	
 	<!-- adauga pentu centrare pagina imediat dupa body , inchide div ul inainte sa inchizi body -->
 	<div class="container">
@@ -46,7 +52,7 @@
 		<?php endforeach; ?>
 		</body>
 	
-		<p><a href="..">Return to JSM home</a></p>
+		<p><a href="..">Return to Biblioteca</a></p>
 		<?php include '../logout.html.php'; ?>
 		
 		</div>

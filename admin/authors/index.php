@@ -22,13 +22,14 @@ if (!userHasRole('Administrator'))
 if (isset($_GET['add']))
 {
 	include $_SERVER['DOCUMENT_ROOT'].'/biblioteca/includes/db.inc.php';
-	$pagetitle='New Author';
+	
+	$pagetitle='Adauga utilizator';
 	$action='addform';
 	$name='';
 	$pren='';
 	$email='';
 	$id='';
-	$button='Add author';
+	$button='Adauga utilizator';
 	
 	//Build the list of roles
 	$sql = "SELECT id, description FROM role";
@@ -42,8 +43,10 @@ if (isset($_GET['add']))
 
 	while ($row = mysqli_fetch_array($result))
 	{
-		$roles[] = array('id'=> $row['id'], 'description'=> $row['description'],
-		           'selected' =>FALSE);
+		$roles[] = array(
+		'id'=> $row['id'],
+		'description'=> $row['description'],
+		'selected' =>FALSE);
 	}
 	
 	include 'form.html.php';
@@ -57,8 +60,9 @@ if (isset($_GET['addform']))
 	include $_SERVER['DOCUMENT_ROOT'].'/biblioteca/includes/db.inc.php';
 	
 	$name = mysqli_real_escape_string($link, $_POST['name']);
-	$email = mysqli_real_escape_string($link, $_POST['email']);
 	$pren = mysqli_real_escape_string($link, $_POST['pren']);
+	$email = mysqli_real_escape_string($link, $_POST['email']);
+	
 	$sql="INSERT INTO author SET 
 		name='$name',
 		pren='$pren',
@@ -71,11 +75,11 @@ if (isset($_GET['addform']))
 		exit();
 		}
 		
-		$authorid=mysqli_insert_id($link);
+    $authorid=mysqli_insert_id($link);
 		
 	if ($_POST['password']!='')
 		{
-		$password=md5($_POST['password'].'biblioteca');
+		$password=md5($_POST['password'].'ijdb');
 		$password=mysqli_real_escape_string($link, $password);
 		$sql="UPDATE author SET
 			password='$password'
@@ -83,28 +87,32 @@ if (isset($_GET['addform']))
 			
 	if (!mysqli_query($link, $sql))
 		{
-			$error='Eroare la introducerea parolei utilizatorului.';
+			$error='Eroare la setarea parolei.';
 			include '../error.html.php';
 			exit();
 		}	
 }
 	
+	
 	if (isset($_POST['roles']))
 	{
-		foreach ($_POST['roles'] as $role)
+		foreach($_POST['roles'] as $role )
 		{
-			$roleid=mysqli_real_escape_string($link, $role);
-			$slq="INSERT INTO authorrole SET
-				authorid = '$authorid',
-				roleid = '$roleid'";
-			if (!mysqli_query($link,$sql))
+			$roleid = mysqli_real_escape_string($link, $role);
+			$sql = "INSERT INTO authorrole SET
+				authorid='$authorid',
+				roleid='$roleid'";
+			if (!mysqli_query($link, $sql))
 			{
-				$error='Eroare la stabilirea rolului pentru utilizator.';
-				include 'error.html.php';
-				exit();			
-			}		
+				$error = 'Eroare la alocarea catre utilizator a rolului selectat.';
+				include '../error.html.php';
+				exit();
+			}
 		}
 	}
+	
+	
+	
 	header('Location:.');
 	exit();
 }
@@ -119,23 +127,24 @@ if (isset($_POST['action']) and $_POST['action']=='Edit')
 	$result = mysqli_query($link, $sql);
 	if (!$result)
 		{
-		$error = 'Eroare la afisarea detaliilor pentru utilizator.';
+		$error = 'Eroare la afisarea datelor pentru utilizator.';
 		include 'error.html.php';
 		exit();
 		}
 		$row = mysqli_fetch_array($result);
 		
-		$pagetitle = 'Editare date Utilizator';
+		$pagetitle = 'Editare Utilizator';
 		$action = 'editform';
 		$name = $row['name'];
 		$pren = $row ['pren'];
 		$email = $row['email'];
 		$id = $row['id'];
-		$button = 'Actualizare date utilizator';
+		$button = 'Actualizare';
 		
 		//Get list of roles assigned to this author
 		$sql = "SELECT roleid FROM authorrole WHERE authorid='$id'";
 		$result=mysqli_query($link, $sql);
+		
 		if (!$result)
 		{
 			$error='Eroare la afisarea listei de roluri.';
@@ -196,9 +205,9 @@ if (isset($_GET['editform']))
 		$password = md5($_POST['password'] . 'ijdb');
 		$password=mysqli_real_escape_string($link, $password);
 		$sql="UPDATE author SET
-			password='$password',
+			password='$password'
 			WHERE id='$id'";
-		if (mysqli_query($link, $sql))
+		if (!mysqli_query($link, $sql))
 		{
 			$error='Eroare la setarea parolei de utilizator.';
 			include '../error.html.php';
@@ -276,7 +285,7 @@ if (isset($_POST['action']) and $_POST['action'] == 'Delete')
 	$sql = "DELETE FROM book WHERE authorid='$id'";
 	if (!mysqli_query($link, $sql))
 	{
-		$error = 'Eroare la stregerea cartii apartinand utilizatorului.';
+		$error = 'Eroare la stergerea cartii apartinand utilizatorului.';
 		include 'error.html.php';
 		exit();
 	}
